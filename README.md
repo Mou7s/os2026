@@ -8,9 +8,9 @@
 
 ## 代码仓库
 
-- 个人学习仓库：[Mou7s/os2026](https://github.com/Mou7s/os2026)（私有）。
-- `origin` 指向课程仓库 `https://git.nju.edu.cn/jyy/os2026.git`，用于获取课程更新；`github` 指向个人仓库，用于保存自己的学习进度。
-- `M1` 分支从 `origin` 拉取课程更新，默认推送到 `github`。提交前只暂存本次相关文件，避免把无关内容一起提交。
+- 个人学习仓库：[Mou7s/os2026](https://github.com/Mou7s/os2026)（公开）。
+- `origin` 指向个人 GitHub 仓库，用于保存和发布自己的学习进度；`upstream` 指向课程仓库 `https://git.nju.edu.cn/jyy/os2026.git`，用于获取课程更新。
+- `M1` 分支从 `upstream` 拉取课程更新，默认推送到 `origin`。提交前只暂存本次相关文件，避免把无关内容一起提交。
 
 ## 学习方式
 
