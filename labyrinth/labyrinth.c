@@ -25,8 +25,20 @@ bool isValidPlayer(char playerId) {
 }
 
 bool loadMap(Labyrinth *labyrinth, const char *filename) {
-    // TODO: Implement this function
-    return false;
+    FILE *fp = fopen(filename, "r");
+    if(fp==NULL){
+      return false;
+    }
+      labyrinth->rows = 0;
+      char buffer[MAX_COLS + 2];
+      
+      while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        size_t len = strlen(buffer);
+        if(len >0 && buffer[len -1] == '\n'){
+          buffer[len-1] = '\0';
+          len--;
+        }
+    }
 }
 
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
