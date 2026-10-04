@@ -51,10 +51,11 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
       labyrinth->map[labyrinth->rows][col] = buffer[col];
       col++;
     }
+    labyrinth->map[labyrinth->rows][col] = '\0';
     labyrinth->rows++;
   }
   fclose(fp);
-  return true;
+  return labyrinth->rows > 0;
 }
 
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
