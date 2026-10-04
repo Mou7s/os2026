@@ -58,14 +58,31 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
 }
 
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
-  // TODO: Implement this function
   Position pos = {-1, -1};
+
+  for (int i = 0; i < labyrinth->rows; i++) {
+    for (int j = 0; j < labyrinth->cols; j++) {
+      if (labyrinth->map[i][j] == playerId) {
+        pos.row = i;
+        pos.col = j;
+        return pos;
+      }
+    }
+  }
   return pos;
 }
 
 Position findFirstEmptySpace(Labyrinth *labyrinth) {
-  // TODO: Implement this function
   Position pos = {-1, -1};
+  for (int i = 0; i < labyrinth->rows; i++) {
+    for (int j = 0; j < labyrinth->cols; j++) {
+      if (labyrinth->map[i][j] == '.') {
+        pos.row = i;
+        pos.col = j;
+        return pos;
+      }
+    }
+  }
   return pos;
 }
 
