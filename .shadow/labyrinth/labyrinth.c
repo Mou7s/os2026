@@ -94,9 +94,20 @@ bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
 }
 
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
+  // 1. 先校验玩家 ID 合法性
+  if (!isValidPlayer(playerId)) {
+    return false;
+  }
+  // 2. 确定玩家当前位置（找不到则出生在第一个空地）
   Position cur = findPlayer(labyrinth, playerId);
+  if (cur.row == -1) {
+    cur = findFirstEmptySpace(labyrinth);
+    if (cur.row == -1) {
+      return false;
+    }
+  }
+  // 3. 计算目标位置 next
   Position next = cur;
-
   if (strcmp(direction, "up") == 0) {
     next.row--;
   } else if (strcmp(direction, "down") == 0) {
@@ -108,16 +119,15 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
   } else {
     return false;
   }
-
-  if (!isValidPlayer(playerId) ||
-      !isValidPlayer(labyrinth->map[cur.row][cur.col])) {
-    return false;
-  }
+  // 4. 检查目标位置是否合法且是空地
   if (!isEmptySpace(labyrinth, next.row, next.col)) {
     return false;
   }
+  // 5. 更新地图
   labyrinth->map[next.row][next.col] = playerId;
-  labyrinth->map[cur.row][cur.col] = '.';
+  if (cur.row != -1 && cur.col != -1) {
+    labyrinth->map[cur.row][cur.col] = '.';
+  }
   return true;
 }
 
