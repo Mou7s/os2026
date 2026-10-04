@@ -162,6 +162,37 @@ void dfs(Labyrinth *labyrinth, int row, int col,
 }
 
 bool isConnected(Labyrinth *labyrinth) {
-  // TODO: Implement this function
-  return false;
+  int emptyCount = 0;
+  int start_row = -1;
+  int start_col = -1;
+  for (int i = 0; i < labyrinth->rows; i++) {
+    for (int j = 0; j < labyrinth->cols; j++) {
+      if (labyrinth->map[i][j] == '.') {
+        emptyCount++;
+        if (start_row == -1) {
+          start_row = i;
+          start_col = j;
+        }
+      }
+    }
+  }
+  if (emptyCount == 0) {
+    return true;
+  }
+  bool visited[MAX_ROWS][MAX_COLS];
+  for (int i = 0; i < labyrinth->rows; i++) {
+    for (int j = 0; j < labyrinth->cols; j++) {
+      visited[i][j] = false;
+    }
+  }
+  Position start = findFirstEmptySpace(labyrinth);
+  dfs(labyrinth, start.row, start.col, visited);
+  for (int i = 0; i < labyrinth->rows; i++) {
+    for (int j = 0; j < labyrinth->cols; j++) {
+      if (labyrinth->map[i][j] == '.' && !visited[i][j]) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
