@@ -70,8 +70,8 @@ Position findFirstEmptySpace(Labyrinth *labyrinth) {
 }
 
 bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
-  if (row > 0 && row < labyrinth->rows && col > 0 && col < labyrinth->cols) {
-    return labyrinth->map[row][col] == ' ';
+  if (row >= 0 && row < labyrinth->rows && col >= 0 && col < labyrinth->cols) {
+    return labyrinth->map[row][col] == '.';
   }
   return false;
 }
