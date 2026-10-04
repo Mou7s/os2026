@@ -199,14 +199,14 @@ bool isConnected(Labyrinth *labyrinth) {
     return true;
   }
   // 4. 初始化 visited 数组
-  bool visited[MAX_ROWS][MAX_COLS];
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
       visited[i][j] = false;
     }
   }
-  Position start = findFirstEmptySpace(labyrinth);
-  dfs(labyrinth, start.row, start.col, visited);
+  // 5. 从第一个空地开始 DFS
+  dfs(labyrinth, start_row, start_col, visited);
+  // 6. 检查是否有未访问的空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
       if (labyrinth->map[i][j] == '.' && !visited[i][j]) {
@@ -214,5 +214,6 @@ bool isConnected(Labyrinth *labyrinth) {
       }
     }
   }
+  // 7. 如果所有空地都已访问，则返回 true
   return true;
 }
