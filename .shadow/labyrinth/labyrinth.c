@@ -42,21 +42,18 @@ int main(int argc, char *argv[]) {
   };
   // 解析命令行参数
   int opt;
-  char map_file[MAX_PATH_LEN];
-  char player_id[10];
+  char *map_file = NULL;
+  char *player_str = NULL;
   char *move_direction = NULL;
-  // 初始化
-  map_file[0] = '\0';
-  player_id[0] = '\0';
+
   while ((opt = getopt_long(argc, argv, "m:p:o:v", longopts, NULL)) != -1) {
     switch (opt) {
     case 'm':
-      strncpy(map_file, optarg, MAX_PATH_LEN - 1);
-      map_file[MAX_PATH_LEN - 1] = '\0';
+      // optarg 是指针，直接指向命令行参数字符串，无需额外数组复制
+      map_file = optarg;
       break;
     case 'p':
-      strncpy(player_id, optarg, sizeof(player_id) - 1);
-      player_id[sizeof(player_id) - 1] = '\0';
+      player_str = optarg;
       break;
     case 'o':
       move_direction = optarg;
@@ -68,6 +65,53 @@ int main(int argc, char *argv[]) {
       printUsage();
       return 1;
     }
+  }
+
+  // 1. 检查是否有未识别的多余参数（如非法命令）
+  if (optind < argc) {
+    printUsage();
+    return 1;
+  }
+
+  // 2. 检查必需参数：--map 和 --player 必须同时提供
+  if (map_file == NULL || player_str == NULL) {
+    printUsage();
+    return 1;
+  }
+
+  // 3. 校验玩家 ID：必须是单个字符且在 '0'~'9' 之间
+  if (strlen(player_str) != 1 || !isValidPlayer(player_str[0])) {
+    return 1;
+  }
+  char playerId = player_str[0];
+
+  // 4. 加载地图（若文件不存在、格式不一致等直接返回 1）
+  Labyrinth lab;
+  if (!loadMap(&lab, map_file)) {
+    return 1;
+  }
+
+  // 5. 校验地图连通性（若所有空地不连通则返回 1）
+  if (!isConnected(&lab)) {
+    return 1;
+  }
+
+  // 6. 根据是否传入 --move 分支处理
+  if (move_direction != NULL) {
+    // 移动模式：移动玩家并写回文件
+    if (!movePlayer(&lab, playerId, move_direction)) {
+      return 1;
+    }
+    if (!saveMap(&lab, map_file)) {
+      return 1;
+    }
+    return 0;
+  } else {
+    // 纯打印模式：原样输出地图内容
+    for (int i = 0; i < lab.rows; i++) {
+      printf("%s\n", lab.map[i]);
+    }
+    return 0;
   }
 }
 
@@ -234,7 +278,7 @@ bool isConnected(Labyrinth *labyrinth) {
   int emptyCount = 0;
   int start_row = -1;
   int start_col = -1;
-  bool visited[MAX_ROWS][MAX_COLS] = {false};
+  bool visited[MAX_ROWS][MAX_COLS];
   // 2. 统计空地数量并找到第一个空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
