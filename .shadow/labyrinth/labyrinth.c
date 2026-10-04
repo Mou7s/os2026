@@ -19,8 +19,7 @@ void printUsage() {
 }
 
 bool isValidPlayer(char playerId) {
-  // TODO: Implement this function
-  return false;
+  return (playerId >= '0' && playerId <= '9');
 }
 
 bool loadMap(Labyrinth *labyrinth, const char *filename) {
