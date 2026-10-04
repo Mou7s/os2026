@@ -119,15 +119,18 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
   } else {
     return false;
   }
+
   // 4. 检查目标位置是否合法且是空地
   if (!isEmptySpace(labyrinth, next.row, next.col)) {
     return false;
   }
+
   // 5. 更新地图
-  labyrinth->map[next.row][next.col] = playerId;
   if (cur.row != -1 && cur.col != -1) {
     labyrinth->map[cur.row][cur.col] = '.';
   }
+  labyrinth->map[next.row][next.col] = playerId;
+
   return true;
 }
 
