@@ -94,8 +94,27 @@ bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
 }
 
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
-  // TODO: Implement this function
-  return false;
+  Position cur = findPlayer(labyrinth, playerId);
+  Position next = cur;
+
+  if (strcmp(direction, "up") == 0) {
+    next.row--;
+  } else if (strcmp(direction, "down") == 0) {
+    next.row++;
+  } else if (strcmp(direction, "left") == 0) {
+    next.col--;
+  } else if (strcmp(direction, "right") == 0) {
+    next.col++;
+  } else {
+    return false;
+  }
+
+  if (!isValidPlayer(cur) || !isEmptySpace(labyrinth, next.row, next.col)) {
+    return false;
+  }
+  labyrinth->map[next.row][next.col] = playerId;
+  labyrinth->map[cur.row][cur.col] = '.';
+  return true;
 }
 
 bool saveMap(Labyrinth *labyrinth, const char *filename) {
