@@ -155,16 +155,34 @@ bool saveMap(Labyrinth *labyrinth, const char *filename) {
   return true;
 }
 
-// Check if all empty spaces are connected using DFS
+// 连通性检测辅助函数
 void dfs(Labyrinth *labyrinth, int row, int col,
          bool visited[MAX_ROWS][MAX_COLS]) {
-  // TODO: Implement this function
+  // 1. 越界检查
+  if (row < 0 || row >= labyrinth->rows || col < 0 || col >= labyrinth->cols) {
+    return;
+  }
+  // 2. 访问墙壁或已访问过的点
+  if (labyrinth->map[row][col] == '#' || visited[row][col]) {
+    return;
+  }
+  // 3. 标记已访问
+  visited[row][col] = true;
+  // 4. 递归访问四个方向
+  dfs(labyrinth, row + 1, col, visited);
+  dfs(labyrinth, row - 1, col, visited);
+  dfs(labyrinth, row, col + 1, visited);
+  dfs(labyrinth, row, col - 1, visited);
 }
 
+// 连通性检测主函数
 bool isConnected(Labyrinth *labyrinth) {
+  // 1. 初始化
   int emptyCount = 0;
   int start_row = -1;
   int start_col = -1;
+  bool visited[MAX_ROWS][MAX_COLS] = {false};
+  // 2. 统计空地数量并找到第一个空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
       if (labyrinth->map[i][j] == '.') {
@@ -176,9 +194,11 @@ bool isConnected(Labyrinth *labyrinth) {
       }
     }
   }
+  // 3. 如果没有空地，则返回 true
   if (emptyCount == 0) {
     return true;
   }
+  // 4. 初始化 visited 数组
   bool visited[MAX_ROWS][MAX_COLS];
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
