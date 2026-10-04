@@ -109,7 +109,11 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
     return false;
   }
 
-  if (!isValidPlayer(cur) || !isEmptySpace(labyrinth, next.row, next.col)) {
+  if (!isValidPlayer(playerId) ||
+      !isValidPlayer(labyrinth->map[cur.row][cur.col])) {
+    return false;
+  }
+  if (!isEmptySpace(labyrinth, next.row, next.col)) {
     return false;
   }
   labyrinth->map[next.row][next.col] = playerId;
