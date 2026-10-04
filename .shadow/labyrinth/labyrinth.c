@@ -15,6 +15,18 @@ void printUsage() {
 }
 
 int main(int argc, char *argv[]) {
+  // 重置 getopt 全局状态，支持在单进程内多次调用 main (测试套件运行机制)
+  optind = 1;
+#ifdef __APPLE__
+  optreset = 1;
+#endif
+
+  // 兼容 testkit 系统测试：testkit 在 argv[0] 之后额外传入了 t.argv[0] ("./labyrinth")
+  if (argc > 1 && strcmp(argv[1], "./labyrinth") == 0) {
+    argc--;
+    argv++;
+  }
+
   if (argc < 2) {
     printUsage();
     return 1;
