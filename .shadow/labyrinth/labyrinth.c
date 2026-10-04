@@ -1,14 +1,10 @@
 #include "labyrinth.h"
 #include "../testkit/testkit.h"
 #include <assert.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-int main(int argc, char *argv[]) {
-  // TODO: Implement this function
-  return 0;
-}
 
 void printUsage() {
   printf("Usage:\n");
@@ -16,6 +12,63 @@ void printUsage() {
   printf("  labyrinth -m map.txt -p id\n");
   printf("  labyrinth --map map.txt --player id --move direction\n");
   printf("  labyrinth --version\n");
+}
+
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    printUsage();
+    return 1;
+  }
+
+  // 检查是否包含 --version
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "--version") == 0) {
+      if (argc == 2) {
+        printf("%s\n", VERSION_INFO);
+        return 0;
+      } else {
+        printUsage();
+        return 1; // --version 和其他参数混用，非法！
+      }
+    }
+  }
+  // 定义长短选项
+  struct option longopts[] = {
+      {"map", required_argument, NULL, 'm'},
+      {"player", required_argument, NULL, 'p'},
+      {"move", required_argument, NULL, 'o'},
+      {"version", no_argument, NULL, 'v'},
+      {NULL, 0, NULL, 0},
+  };
+  // 解析命令行参数
+  int opt;
+  char map_file[MAX_PATH_LEN];
+  char player_id[10];
+  char *move_direction = NULL;
+  // 初始化
+  map_file[0] = '\0';
+  player_id[0] = '\0';
+  while ((opt = getopt_long(argc, argv, "m:p:o:v", longopts, NULL)) != -1) {
+    switch (opt) {
+    case 'm':
+      strncpy(map_file, optarg, MAX_PATH_LEN - 1);
+      map_file[MAX_PATH_LEN - 1] = '\0';
+      break;
+    case 'p':
+      strncpy(player_id, optarg, sizeof(player_id) - 1);
+      player_id[sizeof(player_id) - 1] = '\0';
+      break;
+    case 'o':
+      move_direction = optarg;
+      break;
+    case 'v':
+      printf("%s\n", VERSION_INFO);
+      return 0;
+    default:
+      printUsage();
+      return 1;
+    }
+  }
 }
 
 bool isValidPlayer(char playerId) {
