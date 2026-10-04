@@ -99,8 +99,24 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
 }
 
 bool saveMap(Labyrinth *labyrinth, const char *filename) {
-  // TODO: Implement this function
-  return false;
+  FILE *fp = fopen(filename, "w");
+  if (fp == NULL) {
+    return false;
+  }
+  int i = 0;
+  int j = 0;
+
+  while (i < labyrinth->rows) {
+    while (j < labyrinth->cols) {
+      fputc(labyrinth->map[i][j], fp);
+      j++;
+    }
+    fputc('\n', fp);
+    j = 0;
+    i++;
+  }
+  fclose(fp);
+  return true;
 }
 
 // Check if all empty spaces are connected using DFS
