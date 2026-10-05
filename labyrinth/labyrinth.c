@@ -141,23 +141,47 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
   char buffer[MAX_COLS + 2];
 
   while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+    // 如果已经达到了最大行数限制，还有新行要读，说明迷宫过大
+    if (labyrinth->rows >= MAX_ROWS) {
+      fclose(fp);
+      return false;
+    }
     size_t len = strlen(buffer);
     if (len > 0 && buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0';
       len--;
     }
+    // 处理 Windows 换行符（CRLF 格式中的 \r）
+    if (len > 0 && buffer[len - 1] == '\r') {
+      buffer[len - 1] = '\0';
+      len--;
+    }
+
     int col = 0;
 
     if (labyrinth->rows == 0) {
+      if (len == 0 || len > MAX_COLS) {
+        fclose(fp);
+        return false;
+      }
       labyrinth->cols = len;
-
     } else if (len != labyrinth->cols) {
       fclose(fp);
       return false;
     }
 
     while (col < len) {
-      labyrinth->map[labyrinth->rows][col] = buffer[col];
+      char c = buffer[col];
+
+      // 门卫检查：如果既不是墙，也不是空地，也不是合法玩家
+      if (c != '#' && c != '.' && !isValidPlayer(c)) {
+        fclose(fp);
+        // 非法地图，拒绝加载！
+        return false;
+      }
+
+      // 合法字符原样存入
+      labyrinth->map[labyrinth->rows][col] = c;
       col++;
     }
     labyrinth->map[labyrinth->rows][col] = '\0';
@@ -295,7 +319,7 @@ bool isConnected(Labyrinth *labyrinth) {
   // 2. 统计空地数量并找到第一个空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
-      if (labyrinth->map[i][j] == '.') {
+      if (labyrinth->map[i][j] == '.' || isValidPlayer(labyrinth->map[i][j])) {
         emptyCount++;
         if (start_row == -1) {
           start_row = i;
@@ -319,7 +343,9 @@ bool isConnected(Labyrinth *labyrinth) {
   // 6. 检查是否有未访问的空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
-      if (labyrinth->map[i][j] == '.' && !visited[i][j]) {
+      if ((labyrinth->map[i][j] == '.' ||
+           isValidPlayer(labyrinth->map[i][j])) &&
+          !visited[i][j]) {
         return false;
       }
     }

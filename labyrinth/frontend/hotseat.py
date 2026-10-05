@@ -18,7 +18,7 @@ def find_labyrinth_executable():
     dir_to_check = current_dir
     while dir_to_check != dir_to_check.parent:  # Until reaching root directory
         executable = dir_to_check / "labyrinth"
-        if executable.exists() and os.access(executable, os.X_OK):
+        if executable.is_file() and os.access(executable, os.X_OK):
             return executable
         dir_to_check = dir_to_check.parent
 
@@ -26,7 +26,7 @@ def find_labyrinth_executable():
     for root, dirs, files in os.walk(current_dir):
         if "labyrinth" in files:
             executable = Path(root) / "labyrinth"
-            if os.access(executable, os.X_OK):
+            if executable.is_file() and os.access(executable, os.X_OK):
                 return executable
 
     return None
