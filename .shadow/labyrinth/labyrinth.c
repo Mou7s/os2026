@@ -319,7 +319,7 @@ bool isConnected(Labyrinth *labyrinth) {
   // 2. 统计空地数量并找到第一个空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
-      if (labyrinth->map[i][j] == '.') {
+      if (labyrinth->map[i][j] == '.' || isValidPlayer(labyrinth->map[i][j])) {
         emptyCount++;
         if (start_row == -1) {
           start_row = i;
@@ -343,7 +343,9 @@ bool isConnected(Labyrinth *labyrinth) {
   // 6. 检查是否有未访问的空地
   for (int i = 0; i < labyrinth->rows; i++) {
     for (int j = 0; j < labyrinth->cols; j++) {
-      if (labyrinth->map[i][j] == '.' && !visited[i][j]) {
+      if ((labyrinth->map[i][j] == '.' ||
+           isValidPlayer(labyrinth->map[i][j])) &&
+          !visited[i][j]) {
         return false;
       }
     }
