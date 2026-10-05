@@ -171,7 +171,12 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
     }
 
     while (col < len) {
-      labyrinth->map[labyrinth->rows][col] = buffer[col];
+      char c = buffer[col];
+      if (c == '0' || c == '1') {
+        c = '#';
+      }
+
+      labyrinth->map[labyrinth->rows][col] = c;
       col++;
     }
     labyrinth->map[labyrinth->rows][col] = '\0';
