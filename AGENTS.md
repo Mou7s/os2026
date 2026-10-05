@@ -3,7 +3,7 @@
 ## 课程资料
 
 - 课程主页：[操作系统原理（2026 春季学期）](https://jyywiki.cn/OS/2026/)
-- 本仓库的 `labyrinth` 对应课程页面中的 `[M1] labyrinth` 作业。
+- 本仓库的 `pstree` 对应课程页面中的 `[M2] pstree` 作业（`labyrinth` 对应 `[M1] labyrinth` 已归档至 M1 分支）。
 
 ## 课程学习与经验沉淀
 
