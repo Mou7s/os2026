@@ -6,6 +6,20 @@
 #include <string.h>
 #include <unistd.h> // 提供系统调用，如 getpid(), getppid()
 
+#define MAX_PROCS 4096
+#define MAX_CHILDREN 256
+
+typedef struct Process {
+  pid_t pid;                              // 进程 ID
+  pid_t ppid;                             // 父进程 ID
+  char name[256];                         // 进程名字
+  int child_count;                        // 子进程数量
+  struct Process *children[MAX_CHILDREN]; // 指向子进程的指针数组
+} Process;
+
+static Process procs[MAX_PROCS];
+static int proc_count = 0;
+
 /**
  * read_comm: 读取指定 PID 的进程名称 (Command Name)
  *
