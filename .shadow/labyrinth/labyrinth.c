@@ -21,7 +21,8 @@ int main(int argc, char *argv[]) {
   optreset = 1;
 #endif
 
-  // 兼容 testkit 系统测试：testkit 在 argv[0] 之后额外传入了 t.argv[0] ("./labyrinth")
+  // 兼容 testkit 系统测试：testkit 在 argv[0] 之后额外传入了 t.argv[0]
+  // ("./labyrinth")
   if (argc > 1 && strcmp(argv[1], "./labyrinth") == 0) {
     argc--;
     argv++;
