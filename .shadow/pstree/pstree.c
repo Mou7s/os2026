@@ -177,8 +177,16 @@ int main(int argc, char *argv[]) {
   }
 
   // 3. 打开 /proc 虚拟文件系统目录
-  // Linux 下 /proc 中包含了系统所有正在运行的进程，以及 cpuinfo、meminfo 等
-  DIR *d = opendir("/proc");
+  DIR *d = opendir(proc_path);
+  if (!d) {
+    // macOS 没有 /proc，依次尝试本地模拟目录
+    proc_path = "./mock_proc";
+    d = opendir(proc_path);
+    if (!d) {
+      proc_path = "./pstree/mock_proc";
+      d = opendir(proc_path);
+    }
+  }
   if (!d) {
     perror("opendir /proc");
     return 1;
