@@ -16,7 +16,6 @@ typedef struct Process {
   int child_count;                        // 子进程数量
   struct Process *children[MAX_CHILDREN]; // 指向子进程的指针数组
 } Process;
-
 static Process procs[MAX_PROCS];
 static int proc_count = 0;
 
@@ -136,17 +135,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // 读取自身与父进程的名称
-  pid_t self = getpid();
-  pid_t parent = getppid();
-
-  char self_comm[256] = "?", parent_comm[256] = "?";
-  read_comm(self, self_comm, sizeof self_comm);
-  read_comm(parent, parent_comm, sizeof parent_comm);
-
-  // 打印父进程节点（例如终端 shell：bash(1234)）
-  printf("%s(%d)\n", parent_comm, parent);
-
   // 3. 打开 /proc 虚拟文件系统目录
   // Linux 下 /proc 中包含了系统所有正在运行的进程，以及 cpuinfo、meminfo 等
   DIR *d = opendir("/proc");
@@ -158,30 +146,24 @@ int main(int argc, char *argv[]) {
   // 4. 循环遍历 /proc 目录下的所有文件/子目录
   struct dirent *de;
   while ((de = readdir(d)) != NULL) {
-    // 门卫检查：判断目录名的首字符是否为数字
-    // 只有以纯数字命名的文件夹（如 "1", "1024"）才代表一个进程
-    // 其余诸如 "cpuinfo", "sys", "." 等全部过滤跳过
     if (!isdigit((unsigned char)de->d_name[0]))
       continue;
-
-    // 将目录名字符串转为整数 PID
     pid_t pid = (pid_t)atoi(de->d_name);
-
-    // 获取该进程的父进程 PPID
     pid_t ppid;
     if (get_ppid_from_stat(pid, &ppid) != 0)
       continue;
 
-    // 官方示例此处仅筛选了父进程与当前程序的父进程相同的“兄弟进程”
-    // （后续我们的完整 pstree 需要建立全系统的完整进程树）
-    if (ppid != parent)
-      continue;
-
+    // ✅ 改成这样：读出名字，存进 procs 数组
     char comm[256] = "?";
     read_comm(pid, comm, sizeof comm);
 
-    // 打印出子进程条目，并在当前进程后标记 "<== me"
-    printf("  |- %s(%d)%s\n", comm, pid, (pid == self) ? "  <== me" : "");
+    if (proc_count < MAX_PROCS) {
+      procs[proc_count].pid = pid;
+      procs[proc_count].ppid = ppid;
+      strncpy(procs[proc_count].name, comm, sizeof(procs[proc_count].name) - 1);
+      procs[proc_count].child_count = 0;
+      proc_count++;
+    }
   }
 
   // 5. 关闭目录流，释放系统资源
