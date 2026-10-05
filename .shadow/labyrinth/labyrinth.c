@@ -151,6 +151,12 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
       buffer[len - 1] = '\0';
       len--;
     }
+    // 处理 Windows 换行符（CRLF 格式中的 \r）
+    if (len > 0 && buffer[len - 1] == '\r') {
+      buffer[len - 1] = '\0';
+      len--;
+    }
+
     int col = 0;
 
     if (labyrinth->rows == 0) {
