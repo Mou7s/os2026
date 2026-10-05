@@ -94,6 +94,15 @@ static int get_ppid_from_stat(pid_t pid, pid_t *ppid_out) {
   return 0;
 }
 
+static Process *find_proc(pid_t pid) {
+  for (int i = 0; i < proc_count; i++) {
+    if (procs[i].pid == pid) {
+      return &procs[i];
+    }
+  }
+  return NULL;
+}
+
 int main(int argc, char *argv[]) {
   // 1. 重置 getopt 状态（支持单进程多测试用例）
   optind = 1;
@@ -181,13 +190,4 @@ int main(int argc, char *argv[]) {
   }
 
   return 0;
-}
-
-static Process *find_proc(pid_t pid) {
-  for (int i = 0; i < proc_count; i++) {
-    if (procs[i].pid == pid) {
-      return &procs[i];
-    }
-  }
-  return NULL;
 }
