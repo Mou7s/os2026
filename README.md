@@ -167,5 +167,15 @@
 - **本次主题：** 从 `upstream/M2` 创建并检出 `M2` 本地分支；理解 M2 `pstree` 的目标是读取系统所有进程并按父子关系打印进程树；掌握 Linux `Everything is a file` 与 `procfs`（`/proc`）机制。
 - **代码现状：** `pstree/pstree.c` 已包含官方 starter 示例，演示了如何通过 `opendir("/proc")` 遍历目录，以及如何从 `/proc/[pid]/comm` 和 `/proc/[pid]/stat` 获取进程名与父进程 ID（PPID）。
 - **环境认知：** 当前开发机为 macOS，系统没有原生的 `/proc` 文件系统，直接执行 `./pstree` 会报错 `opendir /proc: No such file or directory`。需要为本地开发设计兼容方案（如本地 mock 测试目录）。
-- **下一步：** 第一步先实现标准命令行选项解析（`-p`、`-n`、`-V`），并确认测试用例行为。
+### 2026-10-06：完成 M2 pstree 核心功能并通过 10/10 全套测试
+
+- **本次主题：** 完整实现 M2 `pstree` 进程树工具。
+  1. 命令行参数：利用 `getopt_long` 解析 `-p`（`--show-pids`）、`-n`（`--numeric-sort`）和 `-V`（`--version`），并处理非法选项报错。
+  2. 进程信息抓取：遍历 `/proc` 目录中的纯数字进程子目录，从 `comm` 文件读取进程名，从 `stat` 文件格式化提取 `ppid`。
+  3. 数据结构与建树：设计带子节点指针数组的 `Process` 结构体，通过 `find_proc` 匹配 `ppid` 构建多叉父子树形结构。
+  4. 遍历与排版：寻找无父节点的根进程启动 DFS 前序深度优先遍历；利用 `qsort` 配合比较函数实现子节点的数值升序排序；支持缩进与可选 PID 打印。
+  5. 跨平台测试方案：针对 macOS 环境缺失 `/proc` 的限制，设计路径退守机制，通过本地 `mock_proc` 成功在 macOS 运行并验证全部测试点。
+- **代码验证：** 编译零警告零报错，全套 10 项系统测试（SystemTest）全部通过（10/10 PASS），命令行参数组合与实测输出均符合预期。
+- **当前状态：** M2 pstree 作业核心功能已全部完成并验证。
+- **下一步：** 整理代码格式，暂存并提交 Git，或在 Linux 环境 / 配置 Token 进行在线评测（`make submit`）。
 
