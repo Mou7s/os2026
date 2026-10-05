@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h> // 提供系统调用，如 getpid(), getppid()
 
+static const char *proc_path = "/proc";
+
 #define MAX_PROCS 4096
 #define MAX_CHILDREN 256
 
@@ -30,8 +32,7 @@ static int proc_count = 0;
  */
 static int read_comm(pid_t pid, char *buf, size_t n) {
   char path[64];
-  // 拼接目标路径：/proc/<pid>/comm
-  snprintf(path, sizeof(path), "/proc/%d/comm", pid);
+  snprintf(path, sizeof(path), "%s/%d/comm", proc_path, pid);
 
   FILE *f = fopen(path, "r");
   if (!f)
@@ -104,8 +105,7 @@ static void print_tree(Process *p, int depth, int show_pids, int numeric_sort) {
  */
 static int get_ppid_from_stat(pid_t pid, pid_t *ppid_out) {
   char path[64], line[4096];
-  // 拼接目标路径：/proc/<pid>/stat
-  snprintf(path, sizeof(path), "/proc/%d/stat", pid);
+  snprintf(path, sizeof(path), "%s/%d/stat", proc_path, pid);
 
   FILE *f = fopen(path, "r");
   if (!f)
