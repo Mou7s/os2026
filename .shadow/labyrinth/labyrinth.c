@@ -141,6 +141,11 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
   char buffer[MAX_COLS + 2];
 
   while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+    // 如果已经达到了最大行数限制，还有新行要读，说明迷宫过大
+    if (labyrinth->rows >= MAX_ROWS) {
+      fclose(fp);
+      return false;
+    }
     size_t len = strlen(buffer);
     if (len > 0 && buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0';
@@ -149,8 +154,11 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
     int col = 0;
 
     if (labyrinth->rows == 0) {
+      if (len == 0 || len > MAX_COLS) {
+        fclose(fp);
+        return false;
+      }
       labyrinth->cols = len;
-
     } else if (len != labyrinth->cols) {
       fclose(fp);
       return false;
