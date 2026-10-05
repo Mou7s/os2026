@@ -50,6 +50,38 @@ static int read_comm(pid_t pid, char *buf, size_t n) {
   return 0;
 }
 
+static int cmp_pid(const void *a, const void *b) {
+  const Process *p1 = *(const Process **)a;
+  const Process *p2 = *(const Process **)b;
+  return (p1->pid > p2->pid) - (p1->pid < p2->pid);
+}
+static void print_tree(Process *p, int depth, int show_pids, int numeric_sort) {
+  if (!p)
+    return;
+
+  // 1. 打印缩进
+  for (int i = 0; i < depth; i++) {
+    printf("  ");
+  }
+
+  // 2. 打印进程名（根据 -p 决定是否附带 pid）
+  if (show_pids) {
+    printf("%s(%d)\n", p->name, p->pid);
+  } else {
+    printf("%s\n", p->name);
+  }
+
+  // 3. 如果指定了 -n，对子进程按 PID 升序排序
+  if (numeric_sort && p->child_count > 1) {
+    qsort(p->children, p->child_count, sizeof(Process *), cmp_pid);
+  }
+
+  // 4. 递归打印每一个孩子
+  for (int i = 0; i < p->child_count; i++) {
+    print_tree(p->children[i], depth + 1, show_pids, numeric_sort);
+  }
+}
+
 /**
  * get_ppid_from_stat: 从 /proc/[pid]/stat 文件中提取父进程 ID (PPID)
  *
@@ -186,6 +218,13 @@ int main(int argc, char *argv[]) {
       if (parent->child_count < MAX_CHILDREN) {
         parent->children[parent->child_count++] = &procs[i];
       }
+    }
+  }
+
+  // 7. 打印整棵树：找到所有根节点并开始 DFS
+  for (int i = 0; i < proc_count; i++) {
+    if (procs[i].ppid == 0 || find_proc(procs[i].ppid) == NULL) {
+      print_tree(&procs[i], 0, show_pids, numeric_sort);
     }
   }
 
