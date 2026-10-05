@@ -172,10 +172,15 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
 
     while (col < len) {
       char c = buffer[col];
-      if (c == '0' || c == '1') {
-        c = '#';
+
+      // 门卫检查：如果既不是墙，也不是空地，也不是合法玩家
+      if (c != '#' && c != '.' && !isValidPlayer(c)) {
+        fclose(fp);
+        // 非法地图，拒绝加载！
+        return false;
       }
 
+      // 合法字符原样存入
       labyrinth->map[labyrinth->rows][col] = c;
       col++;
     }
