@@ -168,5 +168,26 @@ int main(int argc, char *argv[]) {
 
   // 5. 关闭目录流，释放系统资源
   closedir(d);
+
+  // 6. 建立父子树形结构
+  for (int i = 0; i < proc_count; i++) {
+    Process *parent = find_proc(procs[i].ppid);
+    // 如果找到了父进程，并且父进程不是自己（避免死循环）
+    if (parent && parent != &procs[i]) {
+      if (parent->child_count < MAX_CHILDREN) {
+        parent->children[parent->child_count++] = &procs[i];
+      }
+    }
+  }
+
   return 0;
+}
+
+static Process *find_proc(pid_t pid) {
+  for (int i = 0; i < proc_count; i++) {
+    if (procs[i].pid == pid) {
+      return &procs[i];
+    }
+  }
+  return NULL;
 }
